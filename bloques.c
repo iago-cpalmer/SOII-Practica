@@ -1,9 +1,10 @@
 //Autores: Joan Català, Alberto Ruiz y Iago Caldentey Palmer
 
 #include "bloques.h"
-
+#include "semaforo_mutex_posix.h"
 static int descriptor = 0;  // Descriptor del fichero del file system
-
+static sem_t *mutex;
+static unsigned int inside_sc = 0;
 
 // bmount: Abre el file system para la lectura/escritura
 int bmount(const char *camino) {
@@ -13,17 +14,23 @@ int bmount(const char *camino) {
    if ((descriptor = open(camino, O_RDWR | O_CREAT, 0666)) == -1) {
       fprintf(stderr, "Error: bloques.c → bmount() → open()\n");
    }
+   if (!mutex) {
+       mutex = initSem();
+       if (mutex == SEM_FAILED) {
+           return -1;
+       }
+   }
    return descriptor;
 }
 
 // bumount: "Desmonta" el file system que hemos abierto para la lectura/escritura
 int bumount() {
    descriptor = close(descriptor);
-   // hay que asignar el resultado de la operación a la variable ya que bmount() la utiliza
    if (descriptor == -1) {
        fprintf(stderr, "Error: bloques.c → bumount() → close(): %d: %s\n", errno, strerror(errno));
        return -1;
    }
+   deleteSem();
    return 0;
 }
 
@@ -68,4 +75,16 @@ int bread(unsigned int nbloque, void *buf) {
     }
     return bleidos;
   }
+}
+
+
+// Funciones de semáforos
+void mi_waitSem() {
+  if (!inside_sc) waitSem(mutex);
+  inside_sc++;
+}
+
+void mi_signalSem() {
+  inside_sc--;
+  if (!inside_sc) signalSem(mutex);
 }

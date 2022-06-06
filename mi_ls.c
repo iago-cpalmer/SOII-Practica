@@ -4,7 +4,7 @@ int main(int argc, char **argv) {
 
     // Comprobaciòn sintaxis correcta
     if (argv[1] == NULL || argv[2] == NULL) {
-        fprintf(stderr,"Paràmetros no especificados. Uso: mi_mkdir <nombre_dispositivo> </ruta>\n");
+        fprintf(stderr,"Paràmetros no especificados. Uso: mi_ls <nombre_dispositivo> </ruta>\n");
         exit(1);
     }
     if(bmount(argv[1]) ==-1) {

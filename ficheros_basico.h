@@ -16,6 +16,7 @@
 #define INDIRECTOS2 (NPUNTEROS * NPUNTEROS * NPUNTEROS + INDIRECTOS1) // 16.843.020
 
 #define DEBUGN1 0
+
 //////////////////Structs//////////////////
 struct superbloque
 {
